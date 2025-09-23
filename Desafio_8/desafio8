@@ -1,0 +1,235 @@
+---
+title: "desafio08"
+author: "Luciano Floriano"
+format: html
+editor: visual
+---
+```{r}
+library(RSQLite)
+library(tidyverse)
+library(dbplyr)
+```
+
+1.Baixe o arquivo uwmadison.sqlite3. Conecte-se a ele usando o pacote RSQLite, armazenando a conexão em uma variável conn.
+```{r}
+# Conectar ao banco de dados usando caminho relativo
+conn <- dbConnect(SQLite(), "database.sqlite3") #O R estava lendo apenas a pasta e não o arqvuio, portanto foi necessário extrair a pasta e ficar apenas com o arquivo.
+
+# Verificar se a conexão foi estabelecida
+if(dbIsValid(conn)) {
+  print("Conexão estabelecida com sucesso!")
+} else {
+  print("Erro ao conectar ao banco de dados")
+}
+
+```
+```{r}
+tabelas <- dbListTables(conn)
+print("Tabelas disponíveis:")
+tabelas
+```
+
+
+
+2.Quem são e quantos são os professores que lecionaram disciplinas cujo tópico era estatística (subjects.abbreviation='STAT');
+```{r}
+# Listar todas as tabelas disponíveis
+tabelas <- dbListTables(conn)
+print("Tabelas disponíveis no banco de dados:")
+print(tabelas)
+```
+
+```{r}
+# Consulta correta usando as tabelas reais
+query <- "
+SELECT DISTINCT i.id as instructor_id, 
+       i.name as instructor_name,
+       COUNT(DISTINCT s.uuid) as num_secoes
+FROM instructors i
+JOIN teachings t ON i.id = t.instructor_id
+JOIN sections s ON t.section_uuid = s.uuid
+JOIN course_offerings co ON s.course_offering_uuid = co.uuid
+JOIN subject_memberships sm ON co.uuid = sm.course_offering_uuid
+JOIN subjects sub ON sm.subject_code = sub.code
+WHERE sub.abbreviation = 'STAT'
+GROUP BY i.id, i.name
+ORDER BY num_secoes DESC;"
+
+# Executar a consulta
+resultados <- dbGetQuery(conn, query)
+
+# Mostrar resultados
+print("RESPOSTA DA PERGUNTA 2:")
+print("Professores que lecionaram disciplinas de Estatística (STAT):")
+print(resultados)
+print(paste("Total de professores distintos:", nrow(resultados)))
+```
+
+
+
+3.O GPA americano é definido numa escala de 0 a 4, em que A = 4, AB = 3.5, B = 3, BC = 2.5, C = 2, D = 1 e F = 0. Determinando a nota média de cada oferecimento pela ponderação da quantidade de alunos em cada extrato com os valores numéricos de cada conceito, indique (no que se referente a disciplinas no assunto de estatística):
+
+```{r}
+# Primeiro, explorar a estrutura das tabelas
+print("Estrutura da tabela instructors:")
+print(dbGetQuery(conn, "PRAGMA table_info(instructors);"))
+
+print("Estrutura da tabela teachings:")
+print(dbGetQuery(conn, "PRAGMA table_info(teachings);"))
+
+print("Estrutura da tabela grade_distributions:")
+print(dbGetQuery(conn, "PRAGMA table_info(grade_distributions);"))
+
+```
+Quem é o professor mais difícil?
+Quem é o professor mais fácil?
+Qual é a disciplina mais difícil?
+Qual é a disciplina mais fácil?
+
+```{r}
+# Consulta corrigida para calcular GPA médio por professor
+query_professores <- "
+WITH stat_grades AS (
+  SELECT 
+    i.id as instructor_id,
+    i.name as instructor_name,
+    co.uuid as course_offering_uuid,
+    co.name as course_name,
+    gd.a_count,
+    gd.ab_count,
+    gd.b_count,
+    gd.bc_count,
+    gd.c_count,
+    gd.d_count,
+    gd.f_count,
+    -- Calcular total de alunos
+    (gd.a_count + gd.ab_count + gd.b_count + gd.bc_count + 
+     gd.c_count + gd.d_count + gd.f_count) as total_alunos,
+    -- Calcular GPA ponderado
+    (gd.a_count * 4.0 + gd.ab_count * 3.5 + gd.b_count * 3.0 + 
+     gd.bc_count * 2.5 + gd.c_count * 2.0 + gd.d_count * 1.0 + 
+     gd.f_count * 0.0) as soma_ponderada
+  FROM instructors i
+  JOIN teachings t ON i.id = t.instructor_id
+  JOIN sections s ON t.section_uuid = s.uuid
+  JOIN course_offerings co ON s.course_offering_uuid = co.uuid
+  JOIN subject_memberships sm ON co.uuid = sm.course_offering_uuid
+  JOIN subjects sub ON sm.subject_code = sub.code
+  JOIN grade_distributions gd ON (s.course_offering_uuid = gd.course_offering_uuid 
+                                  AND s.number = gd.section_number)
+  WHERE sub.abbreviation = 'STAT'
+    AND (gd.a_count + gd.ab_count + gd.b_count + gd.bc_count + 
+         gd.c_count + gd.d_count + gd.f_count) > 0
+),
+gpa_calculado AS (
+  SELECT 
+    instructor_id,
+    instructor_name,
+    course_offering_uuid,
+    course_name,
+    a_count,
+    ab_count,
+    b_count,
+    bc_count,
+    c_count,
+    d_count,
+    f_count,
+    total_alunos,
+    soma_ponderada,
+    -- Calcular GPA médio
+    CASE 
+      WHEN total_alunos > 0 THEN ROUND(soma_ponderada / total_alunos, 3)
+      ELSE NULL 
+    END as gpa_medio
+  FROM stat_grades
+  WHERE total_alunos > 10  -- Apenas seções com número significativo de alunos
+)
+SELECT * FROM gpa_calculado
+ORDER BY gpa_medio;"
+
+# Executar a consulta de professores
+resultados_professores <- dbGetQuery(conn, query_professores)
+
+# Análise dos professores
+if(nrow(resultados_professores) > 0) {
+  print("RESULTADOS DETALHADOS DO GPA POR PROFESSOR:")
+  print(resultados_professores)
+  
+  # Professor mais difícil (menor GPA)
+  professor_mais_dificil <- resultados_professores[which.min(resultados_professores$gpa_medio), ]
+  cat("\n--- PROFESSOR MAIS DIFÍCIL (MENOR GPA) ---\n")
+  cat("Professor:", professor_mais_dificil$instructor_name, "\n")
+  cat("GPA Médio:", professor_mais_dificil$gpa_medio, "\n")
+  cat("Total de alunos:", professor_mais_dificil$total_alunos, "\n")
+  
+  # Professor mais fácil (maior GPA)
+  professor_mais_facil <- resultados_professores[which.max(resultados_professores$gpa_medio), ]
+  cat("\n--- PROFESSOR MAIS FÁCIL (MAIOR GPA) ---\n")
+  cat("Professor:", professor_mais_facil$instructor_name, "\n")
+  cat("GPA Médio:", professor_mais_facil$gpa_medio, "\n")
+  cat("Total de alunos:", professor_mais_facil$total_alunos, "\n")
+} else {
+  cat("Não foram encontrados dados suficientes para análise de professores.\n")
+}
+
+# Consulta corrigida para disciplinas (sem referência a instructors)
+query_disciplinas <- "
+WITH disciplina_gpa AS (
+  SELECT 
+    co.name as course_name,
+    COUNT(DISTINCT s.uuid) as num_secoes,
+    AVG(
+      (gd.a_count * 4.0 + gd.ab_count * 3.5 + gd.b_count * 3.0 + 
+       gd.bc_count * 2.5 + gd.c_count * 2.0 + gd.d_count * 1.0 + 
+       gd.f_count * 0.0) / 
+      NULLIF((gd.a_count + gd.ab_count + gd.b_count + gd.bc_count + 
+              gd.c_count + gd.d_count + gd.f_count), 0)
+    ) as gpa_medio_disciplina,
+    SUM(gd.a_count + gd.ab_count + gd.b_count + gd.bc_count + 
+        gd.c_count + gd.d_count + gd.f_count) as total_alunos_disciplina
+  FROM course_offerings co
+  JOIN subject_memberships sm ON co.uuid = sm.course_offering_uuid
+  JOIN subjects sub ON sm.subject_code = sub.code
+  JOIN sections s ON co.uuid = s.course_offering_uuid
+  JOIN grade_distributions gd ON (s.course_offering_uuid = gd.course_offering_uuid 
+                                  AND s.number = gd.section_number)
+  WHERE sub.abbreviation = 'STAT'
+    AND (gd.a_count + gd.ab_count + gd.b_count + gd.bc_count + 
+         gd.c_count + gd.d_count + gd.f_count) > 10
+  GROUP BY co.name
+  HAVING total_alunos_disciplina > 30  -- Disciplinas com número significativo de alunos
+)
+SELECT * FROM disciplina_gpa
+ORDER BY gpa_medio_disciplina;"
+
+# Executar a consulta de disciplinas
+disciplinas <- dbGetQuery(conn, query_disciplinas)
+
+# Análise das disciplinas
+if(nrow(disciplinas) > 0) {
+  cat("\n--- DISCIPLINA MAIS DIFÍCIL (MENOR GPA) ---\n")
+  disciplina_mais_dificil <- disciplinas[which.min(disciplinas$gpa_medio_disciplina), ]
+  cat("Disciplina:", disciplina_mais_dificil$course_name, "\n")
+  cat("GPA Médio:", round(disciplina_mais_dificil$gpa_medio_disciplina, 3), "\n")
+  cat("Total de alunos:", disciplina_mais_dificil$total_alunos_disciplina, "\n")
+  cat("Número de seções:", disciplina_mais_dificil$num_secoes, "\n")
+  
+  cat("\n--- DISCIPLINA MAIS FÁCIL (MAIOR GPA) ---\n")
+  disciplina_mais_facil <- disciplinas[which.max(disciplinas$gpa_medio_disciplina), ]
+  cat("Disciplina:", disciplina_mais_facil$course_name, "\n")
+  cat("GPA Médio:", round(disciplina_mais_facil$gpa_medio_disciplina, 3), "\n")
+  cat("Total de alunos:", disciplina_mais_facil$total_alunos_disciplina, "\n")
+  cat("Número de seções:", disciplina_mais_facil$num_secoes, "\n")
+} else {
+  cat("Não foram encontrados dados suficientes para análise de disciplinas.\n")
+}
+
+```
+
+
+
+4.Desconecte do banco de dados.
+```{r}
+dbDisconnect(conn)
+```
+
