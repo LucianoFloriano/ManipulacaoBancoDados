@@ -1,0 +1,211 @@
+---
+title: "Desafio_02"
+author: "Luciano Floriano"
+date: "2025-08-21"
+output: html_document
+---
+
+---
+title: "Desafio_2"
+author: "Luciano Floriano"
+format: html
+editor: visual
+---
+
+```{r setup, include=FALSE}
+# Configurações iniciais do documento
+knitr::opts_chunk$set(echo = TRUE)  # Mostra o código nos resultados
+
+# Configura o mirror do CRAN para baixar pacotes
+options(repos = c(CRAN = "https://cloud.r-project.org/"))
+
+# Carrega a biblioteca reticulate para usar Python dentro do R
+library(reticulate)
+
+# Verifica se os pacotes Python estão instalados, se não, instala
+if (!py_module_available("pandas")) {
+  py_install("pandas")  # Instala o pandas para manipulação de dados
+}
+
+if (!py_module_available("matplotlib")) {
+  py_install("matplotlib")  # Instala matplotlib para gráficos
+}
+
+if (!py_module_available("seaborn")) {
+  py_install("seaborn")  # Instala seaborn para gráficos mais bonitos
+}
+
+if (!py_module_available("numpy")) {
+  py_install("numpy")  # Instala numpy para cálculos numéricos
+}
+```
+
+## Análise de Dados de Voos - American Airlines
+
+```{python}
+# Importa as bibliotecas necessárias
+import pandas as pd  # Para trabalhar com tabelas de dados
+import numpy as np   # Para cálculos matemáticos
+import matplotlib.pyplot as plt  # Para criar gráficos
+import seaborn as sns  # Para gráficos mais elegantes
+from matplotlib.colors import LinearSegmentedColormap  # Para criar cores personalizadas
+import warnings  # Para ignorar mensagens de aviso
+warnings.filterwarnings('ignore')  # Ignora avisos para não poluir a tela
+
+```
+
+```{python}
+# Define a função que processa cada pedaço (chunk) dos dados
+def get_stats(input_df):
+    """
+    Processa um pedaço dos dados: filtra apenas American Airlines e calcula estatísticas
+    """
+    # Filtra apenas voos da American Airlines (AA) e onde o atraso não é vazio
+    filtered = input_df[(input_df['AIRLINE'] == 'AA') & 
+                       (input_df['ARRIVAL_DELAY'].notna())].copy()
+    
+    # Agrupa os dados por MÊS, DIA e CIA AÉREA
+    grouped = filtered.groupby(['MONTH', 'DAY', 'AIRLINE']).agg(
+        n=('ARRIVAL_DELAY', 'size'),  # Conta quantos voos tem em cada grupo
+        atrasos=('ARRIVAL_DELAY', lambda x: (x > 10).sum())  # Conta voos com atraso > 10 min
+    ).reset_index()  # Tira a formatação de grupo, voltando para tabela normal
+    
+    return grouped  # Retorna o resultado do processamento
+
+```
+
+```{python}
+# LEITURA DOS DADOS EM CHUNKS (PEDAÇOS)
+# Define o caminho do arquivo - usei seu caminho específico
+caminho_arquivo = "C:/Users/luflo/OneDrive/Área de Trabalho/ME315/lab_02/flights.csv.zip"
+
+# Define quais colunas queremos ler (para economizar memória)
+cols_of_interest = ['AIRLINE', 'YEAR', 'MONTH', 'DAY', 'ARRIVAL_DELAY']
+
+try:
+    # Lê o arquivo CSV zipado em pedaços de 100.000 registros cada
+    # Isso é importante para arquivos grandes que não cabem na memória de uma vez
+    chunks = pd.read_csv(caminho_arquivo, 
+                        compression='zip',  # Indica que o arquivo está zipado
+                        usecols=cols_of_interest,  # Lê apenas as colunas que nos interessam
+                        chunksize=100000)  # Divide em pedaços de 100 mil registros
+
+    
+    # Lista para guardar os resultados de cada pedaço processado
+    stats_list = []
+    chunk_count = 0  # Contador de pedaços processados
+    total_rows = 0   # Contador total de registros
+    
+    # Processa cada pedaço do arquivo
+    for chunk in chunks:
+        chunk_count += 1
+        total_rows += len(chunk)  # Soma quantos registros já processamos
+        
+        # Processa este pedaço usando nossa função get_stats
+        chunk_stats = get_stats(chunk)
+        stats_list.append(chunk_stats)  # Guarda o resultado
+        
+        # Mostra progresso a cada 5 pedaços processados
+        if chunk_count % 5 == 0:
+            print(f"📊 Processados {chunk_count} pedaços ({total_rows:,} registros)...")
+    
+    # Junta todos os resultados dos pedaços em uma única tabela
+    dados_voos = pd.concat(stats_list, ignore_index=True)
+    
+    # Como um mesmo dia pode estar em pedaços diferentes, precisamos agrupar novamente
+    dados_voos = dados_voos.groupby(['MONTH', 'DAY', 'AIRLINE']).agg(
+        n=('n', 'sum'),  # Soma o total de voos de todos os pedaços
+        atrasos=('atrasos', 'sum')  # Soma o total de atrasos de todos os pedaços
+    ).reset_index()  # Volta para formato de tabela normal
+    
+    
+except Exception as e:
+    # Se der erro, mostra mensagem amigável
+    print("erro ao processar o arquivo: {e}")
+```
+
+```{python}
+# Função para calcular os percentuais de atraso
+def compute_stats(input_df):
+    """
+    Calcula o percentual de voos atrasados para cada dia
+    """
+    # Faz uma cópia para não alterar o original
+    result = input_df.copy()
+    
+    # Calcula o percentual: voos atrasados / total de voos
+    result['Perc'] = result['atrasos'] / result['n']
+    
+    # Cria uma coluna de data no formato AAAA-MM-DD
+    # Usamos 2015 porque os dados são desse ano
+    result['Data'] = pd.to_datetime('2015-' + result['MONTH'].astype(str) + '-' + 
+                                  result['DAY'].astype(str))
+    
+    # Retorna apenas as colunas que precisamos
+    return result[['AIRLINE', 'Data', 'Perc']]
+
+# Aplica a função para calcular os percentuais
+new_dados = compute_stats(dados_voos)
+```
+
+```{python}
+# Função para criar o mapa de calor em formato de calendário
+def plot_calendar_heatmap(stats, cia):
+    """
+    Cria um gráfico de calor que parece um calendário
+    """
+    # Filtra apenas os dados da companhia aérea que queremos (AA)
+    df = stats[stats['AIRLINE'] == cia].copy()
+    
+    # Cria colunas auxiliares para o calendário:
+    df['DiaSemana'] = df['Data'].dt.dayofweek  # 0=segunda, 6=domingo
+    df['Semana'] = df['Data'].dt.isocalendar().week  # Número da semana no ano
+    
+    # Organiza os dados em formato de tabela para o heatmap
+    pivot_table = df.pivot_table(index='Semana', 
+                               columns='DiaSemana', 
+                               values='Perc',
+                               aggfunc='mean')  # Média dos percentuais
+    
+    # Configura o tamanho do gráfico
+    plt.figure(figsize=(14, 8))
+    
+    # Cria uma escala de cores do azul (#4575b4) ao vermelho (#d73027)
+    cmap = LinearSegmentedColormap.from_list('custom', ['#4575b4', '#d73027'])
+    
+    # Cria o mapa de calor
+    sns.heatmap(pivot_table, 
+               cmap=cmap,  # Usa nossa escala de cores
+               linewidths=0.5,  # Linhas finas entre as células
+               linecolor='lightgray',  # Cor das linhas
+               cbar_kws={'label': 'Percentual de Atraso'})  # Legenda da barra de cores
+    
+    # Configura título e labels do gráfico
+    plt.title(f'American Airlines ({cia}) - Percentual de Atrasos por Dia (2015)')
+    plt.xlabel('Dia da Semana')
+    plt.ylabel('Semana do Ano')
+    plt.xticks(ticks=range(7), labels=['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'])
+    plt.yticks(rotation=0)  # Deixa os números na horizontal
+    plt.tight_layout()  # Ajusta o layout para não cortar nada
+    plt.show()  # Mostra o gráfico
+
+# Gera o gráfico para a American Airlines (AA)
+plot_calendar_heatmap(new_dados, 'AA')
+```
+
+```{python}
+# Mostra estatísticas resumidas dos resultados
+print("\n📊 ESTATÍSTICAS FINAIS:")
+print("=" * 40)
+print(f"Total de dias analisados: {len(new_dados)}")
+print(f"Percentual médio de atrasos: {new_dados['Perc'].mean():.3f} ({new_dados['Perc'].mean()*100:.1f}%)")
+print(f"Dia com maior atraso: {new_dados['Perc'].max():.3f} ({new_dados['Perc'].max()*100:.1f}%)")
+print(f"Dia com menor atraso: {new_dados['Perc'].min():.3f} ({new_dados['Perc'].min()*100:.1f}%)")
+
+# Mostra os 5 dias com maiores atrasos
+print("\n📅 Top 5 dias com maiores atrasos:")
+top_atrasos = new_dados.nlargest(5, 'Perc')
+for i, row in top_atrasos.iterrows():
+    print(f"  {row['Data'].date()}: {row['Perc']:.3f} ({row['Perc']*100:.1f}%)")
+```
+
