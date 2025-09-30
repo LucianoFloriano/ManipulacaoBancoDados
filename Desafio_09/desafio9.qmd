@@ -1,0 +1,125 @@
+---
+title: "desafio9"
+format: html
+author: "Luciano Floriano"
+editor: visual
+---
+```{r}
+library(readr)
+library(RSQLite)
+library(DBI)
+library(dplyr)
+```
+
+
+1. Crie um arquivo de banco de dados em SQLite chamado voos.sqlite3. (Dica: o comando dbConnect() se conecta num banco de dados se o arquivo apontado existir ou cria um novo, caso o arquivo não exista.)
+
+```{r}
+con <- dbConnect(RSQLite::SQLite(), "voos.sqlite3")
+con
+```
+
+2. Leia os arquivos airlines.csv e airports.csv. Deposite o conteúdo de cada um destes arquivos nas tabelas, respectivamente, airlines e airports. Utilize o comando dbWriteTable() para isso.
+```{r}
+airlines_file <- "airlines.csv"
+airports_file <- "airports.csv"
+
+# Ler os CSVs
+airlines <- read.csv(airlines_file, stringsAsFactors = FALSE)
+airports <- read.csv(airports_file, stringsAsFactors = FALSE)
+
+# Depositar os dados no banco (criando tabelas airlines e airports)
+dbWriteTable(con, "airlines", airlines, overwrite = TRUE)
+dbWriteTable(con, "airports", airports, overwrite = TRUE)
+
+# Conferir as tabelas criadas
+dbListTables(con)
+
+# Mostrar as primeiras linhas de cada tabela
+head(dbReadTable(con, "airlines"))
+head(dbReadTable(con, "airports"))
+```
+
+
+3. Crie uma função chamada lerDados contendo 2 argumentos, input e pos. A função deve apresentar ao usuário uma mensagem de progresso da leitura do arquivo flights.csv (utilize o comando message()), aos moldes do apresentado abaixo. A função deve salvar apenas os vôos que partiram ou chegaram aos seguintes aeroportos BWI, MIA, SEA, SFO e JFK, numa tabela chamada flights. Observe que a função não deve retornar nada para o usuário, deve apenas gravar a tabela obtida do chunk no banco de dados. (Dica: utilize o comando dbWriteTable() e estude como o argumento append deve ser utilizado para permitir que os chunks intermediários sejam adicionados ao fim da tabela.)
+```{r}
+# Função para processar cada chunk
+lerDados <- function(input, pos) {
+  # Mensagem de progresso
+  message("Leitura atingiu a linha ", pos)
+  
+  # Aeroportos de interesse
+  aeroportos <- c("BWI", "MIA", "SEA", "SFO", "JFK")
+  
+  # Filtrar voos (usando os nomes corretos das colunas)
+  filtrados <- input %>%
+    filter(ORIGIN_AIRPORT %in% aeroportos | DESTINATION_AIRPORT %in% aeroportos)
+  
+  # Gravar no banco
+  dbWriteTable(con,
+               name = "flights",
+               value = filtrados,
+               append = TRUE,
+               overwrite = FALSE)
+  
+  invisible(NULL)
+}
+
+head(dbReadTable(con, "flights"), 10)
+```
+
+```{r}
+voos <- "flights.csv.zip"
+
+read_csv_chunked(
+  file = unz(voos, "flights.csv"),
+  callback = SideEffectChunkCallback$new(lerDados),
+  chunk_size = 100000
+)
+
+```
+
+
+
+4. Leia o arquivo flights.csv, restringindo-se às colunas YEAR, MONTH, DAY, AIRLINE, FLIGHT_NUMBER, ORIGIN_AIRPORT, DESTINATION_AIRPORT e ARRIVAL_DELAY, e aplique a função lerDados() criada acima. Observe, novamente, que a função lerDados() não retorna nada para o usuário. Por isso, a função de callback a ser utilizada é SideEffectChunkCallback$new(). Leia 100 mil registros por vez.
+```{r}
+
+# Leitura em chunks de 100 mil registros, apenas colunas selecionadas
+read_csv_chunked(
+  file = unz(zip_file, "flights.csv"),
+  callback = SideEffectChunkCallback$new(lerDados),
+  chunk_size = 100000,
+  col_types = cols_only(
+    YEAR = col_integer(),
+    MONTH = col_integer(),
+    DAY = col_integer(),
+    AIRLINE = col_character(),
+    FLIGHT_NUMBER = col_integer(),
+    ORIGIN_AIRPORT = col_character(),
+    DESTINATION_AIRPORT = col_character(),
+    ARRIVAL_DELAY = col_double()
+  )
+)
+```
+
+5. 
+Acesse o banco de dados e, por meio de uma chamada em SQL, apresente o tempo médio de atraso de chegada por aeroporto de destino, a sigla do aeroporto, o nome completo do aeroporto e o nome completo da companhia aérea. Ordene o resultado (na mesma chamada de SQL) por ordem decrescente deste atraso médio (i.e., o primeiro registro deve ser o aeroporto que tem o maior tempo de atraso na chegada). Atente para o fato de que o mesmo nome de coluna pode acontecer em diferentes tabelas.
+```{r}
+resultado <- dbGetQuery(con, "
+  SELECT 
+      f.DESTINATION_AIRPORT AS destino,
+      a.AIRPORT AS nome_aeroporto,
+      al.AIRLINE AS nome_companhia,
+      AVG(f.ARRIVAL_DELAY) AS atraso_medio
+  FROM flights f
+  JOIN airports a 
+      ON f.DESTINATION_AIRPORT = a.IATA_CODE
+  JOIN airlines al 
+      ON f.AIRLINE = al.IATA_CODE
+  GROUP BY f.DESTINATION_AIRPORT, a.AIRPORT, al.AIRLINE
+  ORDER BY atraso_medio DESC
+")
+
+head(resultado, 10)  # mostra os 10 primeiros
+```
+
