@@ -1,0 +1,788 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={desafio10},
+  pdfauthor={Luciano Floriano},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{desafio10}
+\author{Luciano Floriano}
+\date{2025-10-02}
+
+\begin{document}
+\maketitle
+
+\begin{verbatim}
+## Using virtual environment "C:/Users/luflo/AppData/Local/R/cache/R/reticulate/uv/cache/archive-v0/qj_0-rP_hm7QfbZg_7cPu" ...
+\end{verbatim}
+
+\begin{verbatim}
+## + "C:/Users/luflo/AppData/Local/R/cache/R/reticulate/uv/cache/archive-v0/qj_0-rP_hm7QfbZg_7cPu/Scripts/python.exe" -m pip install --upgrade --no-user polars
+\end{verbatim}
+
+\begin{verbatim}
+## Using virtual environment "C:/Users/luflo/AppData/Local/R/cache/R/reticulate/uv/cache/archive-v0/qj_0-rP_hm7QfbZg_7cPu" ...
+\end{verbatim}
+
+\begin{verbatim}
+## + "C:/Users/luflo/AppData/Local/R/cache/R/reticulate/uv/cache/archive-v0/qj_0-rP_hm7QfbZg_7cPu/Scripts/python.exe" -m pip install --upgrade --no-user fastexcel
+\end{verbatim}
+
+\begin{verbatim}
+## Using virtual environment "C:/Users/luflo/AppData/Local/R/cache/R/reticulate/uv/cache/archive-v0/qj_0-rP_hm7QfbZg_7cPu" ...
+\end{verbatim}
+
+\begin{verbatim}
+## + "C:/Users/luflo/AppData/Local/R/cache/R/reticulate/uv/cache/archive-v0/qj_0-rP_hm7QfbZg_7cPu/Scripts/python.exe" -m pip install --upgrade --no-user pyarrow
+\end{verbatim}
+
+Data de realização desse código:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ datetime}
+
+\CommentTok{\# Data e hora atual}
+\NormalTok{agora }\OperatorTok{=}\NormalTok{ datetime.datetime.now()}
+\BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Arquivo compilado em: }\SpecialCharTok{\{}\NormalTok{agora}\SpecialCharTok{.}\NormalTok{strftime(}\StringTok{\textquotesingle{}}\SpecialCharTok{\%d}\StringTok{/\%m/\%Y às \%H:\%M:\%S\textquotesingle{}}\NormalTok{)}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Arquivo compilado em: 02/10/2025 às 11:20:09
+\end{verbatim}
+
+Importando os dados:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ polars }\ImportTok{as}\NormalTok{ pl}
+
+\CommentTok{\# Lê um CSV, mas já traz só as colunas que interessam (código, cidade e estado)}
+\NormalTok{aeroportos }\OperatorTok{=}\NormalTok{ pl.read\_csv(}\StringTok{"airports.csv"}\NormalTok{,}
+\NormalTok{                         columns}\OperatorTok{=}\NormalTok{[}\StringTok{"IATA\_CODE"}\NormalTok{, }\StringTok{"CITY"}\NormalTok{, }\StringTok{"STATE"}\NormalTok{])}
+
+\NormalTok{aeroportos.head(}\DecValTok{2}\NormalTok{) }\CommentTok{\#mostra só as 2 primeiras linhas.}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (2, 3)
+## ┌───────────┬───────────┬───────┐
+## │ IATA_CODE ┆ CITY      ┆ STATE │
+## │ ---       ┆ ---       ┆ ---   │
+## │ str       ┆ str       ┆ str   │
+## ╞═══════════╪═══════════╪═══════╡
+## │ ABE       ┆ Allentown ┆ PA    │
+## │ ABI       ┆ Abilene   ┆ TX    │
+## └───────────┴───────────┴───────┘
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ polars }\ImportTok{as}\NormalTok{ pl}
+
+\NormalTok{wdi }\OperatorTok{=}\NormalTok{ pl.read\_excel(}\StringTok{"WDIEXCEL.xlsx"}\NormalTok{, sheet\_name}\OperatorTok{=}\StringTok{"Country"}\NormalTok{, }
+\NormalTok{                    columns}\OperatorTok{=}\NormalTok{[}\StringTok{"Short Name"}\NormalTok{, }\StringTok{"Region"}\NormalTok{]) }\CommentTok{\#Puxa a aba "Country" e só pega as colunas “nome curto” e “região”.}
+
+\NormalTok{wdi.head(}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (2, 2)
+## ┌─────────────┬───────────────────────────┐
+## │ Short Name  ┆ Region                    │
+## │ ---         ┆ ---                       │
+## │ str         ┆ str                       │
+## ╞═════════════╪═══════════════════════════╡
+## │ Aruba       ┆ Latin America & Caribbean │
+## │ Afghanistan ┆ South Asia                │
+## └─────────────┴───────────────────────────┘
+\end{verbatim}
+
+Um Exemplo Simples
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df }\OperatorTok{=}\NormalTok{ pl.DataFrame(\{}
+    \StringTok{"grupo"}\NormalTok{: [}\StringTok{"A"}\NormalTok{, }\StringTok{"A"}\NormalTok{, }\StringTok{"B"}\NormalTok{, }\StringTok{"B"}\NormalTok{, }\StringTok{"C"}\NormalTok{],}
+    \StringTok{"valor1"}\NormalTok{: [}\DecValTok{10}\NormalTok{, }\DecValTok{15}\NormalTok{, }\DecValTok{10}\NormalTok{, }\VariableTok{None}\NormalTok{, }\DecValTok{25}\NormalTok{],}
+    \StringTok{"valor2"}\NormalTok{: [}\DecValTok{5}\NormalTok{, }\VariableTok{None}\NormalTok{, }\DecValTok{20}\NormalTok{, }\DecValTok{30}\NormalTok{, }\VariableTok{None}\NormalTok{] }\CommentTok{\#tabela com grupos e duas colunas de valores (alguns nulos).}
+\NormalTok{\})}
+\NormalTok{df}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (5, 3)
+## ┌───────┬────────┬────────┐
+## │ grupo ┆ valor1 ┆ valor2 │
+## │ ---   ┆ ---    ┆ ---    │
+## │ str   ┆ i64    ┆ i64    │
+## ╞═══════╪════════╪════════╡
+## │ A     ┆ 10     ┆ 5      │
+## │ A     ┆ 15     ┆ null   │
+## │ B     ┆ 10     ┆ 20     │
+## │ B     ┆ null   ┆ 30     │
+## │ C     ┆ 25     ┆ null   │
+## └───────┴────────┴────────┘
+\end{verbatim}
+
+Operando em valor1
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df[}\StringTok{"valor1"}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (5,)
+## Series: 'valor1' [i64]
+## [
+##  10
+##  15
+##  10
+##  null
+##  25
+## ]
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{print}\NormalTok{(}\StringTok{"Média do valor 1:"}\NormalTok{,(df[}\StringTok{"valor1"}\NormalTok{].mean())) }\CommentTok{\#Mostra a coluna valor1 e já calcula a média dela.}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Média do valor 1: 15.0
+\end{verbatim}
+
+Operando em valor1
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df.select([}
+\NormalTok{  pl.col(}\StringTok{"valor1"}\NormalTok{).mean().alias(}\StringTok{"media\_v1"}\NormalTok{),}
+\NormalTok{  pl.col(}\StringTok{"valor2"}\NormalTok{).mean() }\CommentTok{\#retorna um mini{-}DataFrame com as médias.}
+\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (1, 2)
+## ┌──────────┬───────────┐
+## │ media_v1 ┆ valor2    │
+## │ ---      ┆ ---       │
+## │ f64      ┆ f64       │
+## ╞══════════╪═══════════╡
+## │ 15.0     ┆ 18.333333 │
+## └──────────┴───────────┘
+\end{verbatim}
+
+Quais são as médias da variável valor1 e o valor mínimo da variável
+valor2 para cada um dos grupos definidos por grupo?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df.group\_by(}\StringTok{"grupo"}\NormalTok{).agg([}
+\NormalTok{  pl.col(}\StringTok{"valor1"}\NormalTok{).mean().alias(}\StringTok{"media\_valor1"}\NormalTok{),}
+\NormalTok{  pl.col(}\StringTok{"valor2"}\NormalTok{).}\BuiltInTok{min}\NormalTok{().alias(}\StringTok{"min\_valor2"}\NormalTok{)}
+\NormalTok{]).sort(}\StringTok{"grupo"}\NormalTok{) }\CommentTok{\#Calcula a média de valor1 e o mínimo de valor2 para cada grupo A, B, C. Depois organiza pelo nome do grupo.}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (3, 3)
+## ┌───────┬──────────────┬────────────┐
+## │ grupo ┆ media_valor1 ┆ min_valor2 │
+## │ ---   ┆ ---          ┆ ---        │
+## │ str   ┆ f64          ┆ i64        │
+## ╞═══════╪══════════════╪════════════╡
+## │ A     ┆ 12.5         ┆ 5          │
+## │ B     ┆ 10.0         ┆ 20         │
+## │ C     ┆ 25.0         ┆ null       │
+## └───────┴──────────────┴────────────┘
+\end{verbatim}
+
+Calcule o percentual de vôos das cias. aéreas ``AA'' e ``DL'' que
+atrasaram pelo menos 30 minutos nas chegadas aos aeroportos ``SEA'',
+``MIA'' e ``BWI''.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ polars }\ImportTok{as}\NormalTok{ pl}
+
+\CommentTok{\# Correção: usar schema\_overrides e ler arquivo ZIP corretamente}
+\NormalTok{voos }\OperatorTok{=}\NormalTok{ pl.read\_csv(}\StringTok{"flights.csv"}\NormalTok{,}
+\NormalTok{                   columns}\OperatorTok{=}\NormalTok{[}\StringTok{"AIRLINE"}\NormalTok{, }\StringTok{"ARRIVAL\_DELAY"}\NormalTok{, }\StringTok{"DESTINATION\_AIRPORT"}\NormalTok{],}
+\NormalTok{                   schema\_overrides}\OperatorTok{=}\NormalTok{\{}\StringTok{"AIRLINE"}\NormalTok{: pl.Utf8,}
+                                    \StringTok{"ARRIVAL\_DELAY"}\NormalTok{: pl.Int32,}
+                                    \StringTok{"DESTINATION\_AIRPORT"}\NormalTok{: pl.Utf8\}) }\CommentTok{\#Carrega só as colunas úteis (companhia, atraso e destino). Também define os tipos de dados certinhos.}
+\NormalTok{voos.shape}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## (5819079, 3)
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{voos.head(}\DecValTok{3}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (3, 3)
+## ┌─────────┬─────────────────────┬───────────────┐
+## │ AIRLINE ┆ DESTINATION_AIRPORT ┆ ARRIVAL_DELAY │
+## │ ---     ┆ ---                 ┆ ---           │
+## │ str     ┆ str                 ┆ i32           │
+## ╞═════════╪═════════════════════╪═══════════════╡
+## │ AS      ┆ SEA                 ┆ -22           │
+## │ AA      ┆ PBI                 ┆ -9            │
+## │ US      ┆ CLT                 ┆ 5             │
+## └─────────┴─────────────────────┴───────────────┘
+\end{verbatim}
+
+Calcule o percentual de vôos das cias. aéreas ``AA'' e ``DL'' que
+atrasaram pelo menos 30 minutos nas chegadas aos aeroportos ``SEA'',
+``MIA'' e ``BWI''.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{resultado }\OperatorTok{=}\NormalTok{ (}
+\NormalTok{  voos.drop\_nulls([}\StringTok{"AIRLINE"}\NormalTok{, }\StringTok{"DESTINATION\_AIRPORT"}\NormalTok{, }\StringTok{"ARRIVAL\_DELAY"}\NormalTok{])}
+\NormalTok{  .}\BuiltInTok{filter}\NormalTok{(}
+\NormalTok{    pl.col(}\StringTok{"AIRLINE"}\NormalTok{).is\_in([}\StringTok{"AA"}\NormalTok{, }\StringTok{"DL"}\NormalTok{]) }\OperatorTok{\&}
+\NormalTok{    pl.col(}\StringTok{"DESTINATION\_AIRPORT"}\NormalTok{).is\_in([}\StringTok{"SEA"}\NormalTok{, }\StringTok{"MIA"}\NormalTok{, }\StringTok{"BWI"}\NormalTok{])}
+\NormalTok{    )}
+\NormalTok{    .group\_by([}\StringTok{"AIRLINE"}\NormalTok{, }\StringTok{"DESTINATION\_AIRPORT"}\NormalTok{])}
+\NormalTok{    .agg([}
+\NormalTok{      (pl.col(}\StringTok{"ARRIVAL\_DELAY"}\NormalTok{) }\OperatorTok{\textgreater{}} \DecValTok{30}\NormalTok{).mean().alias(}\StringTok{"atraso\_medio"}\NormalTok{)}
+\NormalTok{      ])}
+\NormalTok{) }\CommentTok{\#Filtra só voos da AA e DL para os aeroportos pedidos, remove nulos e calcula o percentual que atrasou mais de 30 minutos.}
+\NormalTok{resultado.sort(}\StringTok{"atraso\_medio"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (6, 3)
+## ┌─────────┬─────────────────────┬──────────────┐
+## │ AIRLINE ┆ DESTINATION_AIRPORT ┆ atraso_medio │
+## │ ---     ┆ ---                 ┆ ---          │
+## │ str     ┆ str                 ┆ f64          │
+## ╞═════════╪═════════════════════╪══════════════╡
+## │ DL      ┆ BWI                 ┆ 0.069455     │
+## │ DL      ┆ SEA                 ┆ 0.072967     │
+## │ DL      ┆ MIA                 ┆ 0.090467     │
+## │ AA      ┆ MIA                 ┆ 0.117894     │
+## │ AA      ┆ SEA                 ┆ 0.124212     │
+## │ AA      ┆ BWI                 ┆ 0.127523     │
+## └─────────┴─────────────────────┴──────────────┘
+\end{verbatim}
+
+\subsection{Segundo conjunto de
+exercícios}\label{segundo-conjunto-de-exercuxedcios}
+
+Dados Clientes
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Criando DataFrames}
+\NormalTok{clientes }\OperatorTok{=}\NormalTok{ pl.DataFrame(\{}
+    \StringTok{"cliente\_id"}\NormalTok{: [}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{4}\NormalTok{],}
+    \StringTok{"nome"}\NormalTok{: [}\StringTok{"Ana"}\NormalTok{, }\StringTok{"Bruno"}\NormalTok{, }\StringTok{"Clara"}\NormalTok{, }\StringTok{"Daniel"}\NormalTok{]}
+\NormalTok{\})}
+
+\BuiltInTok{print}\NormalTok{(clientes)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (4, 2)
+## ┌────────────┬────────┐
+## │ cliente_id ┆ nome   │
+## │ ---        ┆ ---    │
+## │ i64        ┆ str    │
+## ╞════════════╪════════╡
+## │ 1          ┆ Ana    │
+## │ 2          ┆ Bruno  │
+## │ 3          ┆ Clara  │
+## │ 4          ┆ Daniel │
+## └────────────┴────────┘
+\end{verbatim}
+
+Dados Compras
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pedidos }\OperatorTok{=}\NormalTok{ pl.DataFrame(\{}
+    \StringTok{"pedido\_id"}\NormalTok{: [}\DecValTok{101}\NormalTok{, }\DecValTok{102}\NormalTok{, }\DecValTok{103}\NormalTok{, }\DecValTok{104}\NormalTok{, }\DecValTok{105}\NormalTok{],}
+    \StringTok{"cliente\_id"}\NormalTok{: [}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{],}
+    \StringTok{"valor"}\NormalTok{: [}\FloatTok{100.50}\NormalTok{, }\FloatTok{250.75}\NormalTok{, }\FloatTok{75.00}\NormalTok{, }\FloatTok{130.00}\NormalTok{, }\FloatTok{79.00}\NormalTok{]}
+\NormalTok{\})}
+
+\BuiltInTok{print}\NormalTok{(pedidos)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (5, 3)
+## ┌───────────┬────────────┬────────┐
+## │ pedido_id ┆ cliente_id ┆ valor  │
+## │ ---       ┆ ---        ┆ ---    │
+## │ i64       ┆ i64        ┆ f64    │
+## ╞═══════════╪════════════╪════════╡
+## │ 101       ┆ 1          ┆ 100.5  │
+## │ 102       ┆ 2          ┆ 250.75 │
+## │ 103       ┆ 3          ┆ 75.0   │
+## │ 104       ┆ 1          ┆ 130.0  │
+## │ 105       ┆ 5          ┆ 79.0   │
+## └───────────┴────────────┴────────┘
+\end{verbatim}
+
+Exemplo INNER JOIN
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{res\_ij }\OperatorTok{=}\NormalTok{ clientes.join(pedidos, on}\OperatorTok{=}\StringTok{"cliente\_id"}\NormalTok{, how}\OperatorTok{=}\StringTok{"inner"}\NormalTok{) }\CommentTok{\#Média dos valores comprados por cada cliente.}
+\BuiltInTok{print}\NormalTok{(res\_ij)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (4, 4)
+## ┌────────────┬───────┬───────────┬────────┐
+## │ cliente_id ┆ nome  ┆ pedido_id ┆ valor  │
+## │ ---        ┆ ---   ┆ ---       ┆ ---    │
+## │ i64        ┆ str   ┆ i64       ┆ f64    │
+## ╞════════════╪═══════╪═══════════╪════════╡
+## │ 1          ┆ Ana   ┆ 101       ┆ 100.5  │
+## │ 2          ┆ Bruno ┆ 102       ┆ 250.75 │
+## │ 3          ┆ Clara ┆ 103       ┆ 75.0   │
+## │ 1          ┆ Ana   ┆ 104       ┆ 130.0  │
+## └────────────┴───────┴───────────┴────────┘
+\end{verbatim}
+
+Exemplo LEFT JOIN
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{res\_lj }\OperatorTok{=}\NormalTok{ clientes.join(pedidos, on}\OperatorTok{=}\StringTok{"cliente\_id"}\NormalTok{, how}\OperatorTok{=}\StringTok{"left"}\NormalTok{) }
+\BuiltInTok{print}\NormalTok{(res\_lj)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (5, 4)
+## ┌────────────┬────────┬───────────┬────────┐
+## │ cliente_id ┆ nome   ┆ pedido_id ┆ valor  │
+## │ ---        ┆ ---    ┆ ---       ┆ ---    │
+## │ i64        ┆ str    ┆ i64       ┆ f64    │
+## ╞════════════╪════════╪═══════════╪════════╡
+## │ 1          ┆ Ana    ┆ 101       ┆ 100.5  │
+## │ 1          ┆ Ana    ┆ 104       ┆ 130.0  │
+## │ 2          ┆ Bruno  ┆ 102       ┆ 250.75 │
+## │ 3          ┆ Clara  ┆ 103       ┆ 75.0   │
+## │ 4          ┆ Daniel ┆ null      ┆ null   │
+## └────────────┴────────┴───────────┴────────┘
+\end{verbatim}
+
+Exemplo RIGHT JOIN
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{res\_rj }\OperatorTok{=}\NormalTok{ clientes.join(pedidos, on}\OperatorTok{=}\StringTok{"cliente\_id"}\NormalTok{, how}\OperatorTok{=}\StringTok{"right"}\NormalTok{) }
+\BuiltInTok{print}\NormalTok{(res\_rj)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (5, 4)
+## ┌───────┬───────────┬────────────┬────────┐
+## │ nome  ┆ pedido_id ┆ cliente_id ┆ valor  │
+## │ ---   ┆ ---       ┆ ---        ┆ ---    │
+## │ str   ┆ i64       ┆ i64        ┆ f64    │
+## ╞═══════╪═══════════╪════════════╪════════╡
+## │ Ana   ┆ 101       ┆ 1          ┆ 100.5  │
+## │ Bruno ┆ 102       ┆ 2          ┆ 250.75 │
+## │ Clara ┆ 103       ┆ 3          ┆ 75.0   │
+## │ Ana   ┆ 104       ┆ 1          ┆ 130.0  │
+## │ null  ┆ 105       ┆ 5          ┆ 79.0   │
+## └───────┴───────────┴────────────┴────────┘
+\end{verbatim}
+
+Exemplo OUTER JOIN
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{res\_oj }\OperatorTok{=}\NormalTok{ clientes.join(pedidos, on}\OperatorTok{=}\StringTok{"cliente\_id"}\NormalTok{, how}\OperatorTok{=}\StringTok{"full"}\NormalTok{)}
+\BuiltInTok{print}\NormalTok{(res\_oj)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (6, 5)
+## ┌────────────┬────────┬───────────┬──────────────────┬────────┐
+## │ cliente_id ┆ nome   ┆ pedido_id ┆ cliente_id_right ┆ valor  │
+## │ ---        ┆ ---    ┆ ---       ┆ ---              ┆ ---    │
+## │ i64        ┆ str    ┆ i64       ┆ i64              ┆ f64    │
+## ╞════════════╪════════╪═══════════╪══════════════════╪════════╡
+## │ 1          ┆ Ana    ┆ 101       ┆ 1                ┆ 100.5  │
+## │ 2          ┆ Bruno  ┆ 102       ┆ 2                ┆ 250.75 │
+## │ 3          ┆ Clara  ┆ 103       ┆ 3                ┆ 75.0   │
+## │ 1          ┆ Ana    ┆ 104       ┆ 1                ┆ 130.0  │
+## │ null       ┆ null   ┆ 105       ┆ 5                ┆ 79.0   │
+## │ 4          ┆ Daniel ┆ null      ┆ null             ┆ null   │
+## └────────────┴────────┴───────────┴──────────────────┴────────┘
+\end{verbatim}
+
+Exemplo CROSS JOIN
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{res\_cj }\OperatorTok{=}\NormalTok{ clientes.join(pedidos, how}\OperatorTok{=}\StringTok{"cross"}\NormalTok{)}
+\BuiltInTok{print}\NormalTok{(res\_cj)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (20, 5)
+## ┌────────────┬────────┬───────────┬──────────────────┬────────┐
+## │ cliente_id ┆ nome   ┆ pedido_id ┆ cliente_id_right ┆ valor  │
+## │ ---        ┆ ---    ┆ ---       ┆ ---              ┆ ---    │
+## │ i64        ┆ str    ┆ i64       ┆ i64              ┆ f64    │
+## ╞════════════╪════════╪═══════════╪══════════════════╪════════╡
+## │ 1          ┆ Ana    ┆ 101       ┆ 1                ┆ 100.5  │
+## │ 1          ┆ Ana    ┆ 102       ┆ 2                ┆ 250.75 │
+## │ 1          ┆ Ana    ┆ 103       ┆ 3                ┆ 75.0   │
+## │ 1          ┆ Ana    ┆ 104       ┆ 1                ┆ 130.0  │
+## │ 1          ┆ Ana    ┆ 105       ┆ 5                ┆ 79.0   │
+## │ …          ┆ …      ┆ …         ┆ …                ┆ …      │
+## │ 4          ┆ Daniel ┆ 101       ┆ 1                ┆ 100.5  │
+## │ 4          ┆ Daniel ┆ 102       ┆ 2                ┆ 250.75 │
+## │ 4          ┆ Daniel ┆ 103       ┆ 3                ┆ 75.0   │
+## │ 4          ┆ Daniel ┆ 104       ┆ 1                ┆ 130.0  │
+## │ 4          ┆ Daniel ┆ 105       ┆ 5                ┆ 79.0   │
+## └────────────┴────────┴───────────┴──────────────────┴────────┘
+\end{verbatim}
+
+P1: Qual é o valor médio das compras realizadas para cada cliente
+identificado? Como responder P1?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{print}\NormalTok{(clientes)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (4, 2)
+## ┌────────────┬────────┐
+## │ cliente_id ┆ nome   │
+## │ ---        ┆ ---    │
+## │ i64        ┆ str    │
+## ╞════════════╪════════╡
+## │ 1          ┆ Ana    │
+## │ 2          ┆ Bruno  │
+## │ 3          ┆ Clara  │
+## │ 4          ┆ Daniel │
+## └────────────┴────────┘
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{print}\NormalTok{(pedidos)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (5, 3)
+## ┌───────────┬────────────┬────────┐
+## │ pedido_id ┆ cliente_id ┆ valor  │
+## │ ---       ┆ ---        ┆ ---    │
+## │ i64       ┆ i64        ┆ f64    │
+## ╞═══════════╪════════════╪════════╡
+## │ 101       ┆ 1          ┆ 100.5  │
+## │ 102       ┆ 2          ┆ 250.75 │
+## │ 103       ┆ 3          ┆ 75.0   │
+## │ 104       ┆ 1          ┆ 130.0  │
+## │ 105       ┆ 5          ┆ 79.0   │
+## └───────────┴────────────┴────────┘
+\end{verbatim}
+
+Resposta:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{res }\OperatorTok{=}\NormalTok{ res\_ij.group\_by([}\StringTok{"nome"}\NormalTok{, }\StringTok{"cliente\_id"}\NormalTok{]).agg(pl.col(}\StringTok{"valor"}\NormalTok{).mean())}
+\BuiltInTok{print}\NormalTok{(res)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (3, 3)
+## ┌───────┬────────────┬────────┐
+## │ nome  ┆ cliente_id ┆ valor  │
+## │ ---   ┆ ---        ┆ ---    │
+## │ str   ┆ i64        ┆ f64    │
+## ╞═══════╪════════════╪════════╡
+## │ Ana   ┆ 1          ┆ 115.25 │
+## │ Bruno ┆ 2          ┆ 250.75 │
+## │ Clara ┆ 3          ┆ 75.0   │
+## └───────┴────────────┴────────┘
+\end{verbatim}
+
+P2: Informe os nomes e a quantidade de compras com valor mínimo de
+\$100.00 realizadas por cada cliente. Como responder P2?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{print}\NormalTok{(clientes)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (4, 2)
+## ┌────────────┬────────┐
+## │ cliente_id ┆ nome   │
+## │ ---        ┆ ---    │
+## │ i64        ┆ str    │
+## ╞════════════╪════════╡
+## │ 1          ┆ Ana    │
+## │ 2          ┆ Bruno  │
+## │ 3          ┆ Clara  │
+## │ 4          ┆ Daniel │
+## └────────────┴────────┘
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{print}\NormalTok{(pedidos)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (5, 3)
+## ┌───────────┬────────────┬────────┐
+## │ pedido_id ┆ cliente_id ┆ valor  │
+## │ ---       ┆ ---        ┆ ---    │
+## │ i64       ┆ i64        ┆ f64    │
+## ╞═══════════╪════════════╪════════╡
+## │ 101       ┆ 1          ┆ 100.5  │
+## │ 102       ┆ 2          ┆ 250.75 │
+## │ 103       ┆ 3          ┆ 75.0   │
+## │ 104       ┆ 1          ┆ 130.0  │
+## │ 105       ┆ 5          ┆ 79.0   │
+## └───────────┴────────────┴────────┘
+\end{verbatim}
+
+Reposta:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{res }\OperatorTok{=}\NormalTok{ (res\_oj.with\_columns(pl.col(}\StringTok{"valor"}\NormalTok{) }\OperatorTok{\textgreater{}} \DecValTok{100}\NormalTok{)}
+\NormalTok{       .group\_by(}\StringTok{"nome"}\NormalTok{)}
+\NormalTok{       .agg(pl.col(}\StringTok{"valor"}\NormalTok{).}\BuiltInTok{sum}\NormalTok{())) }\CommentTok{\#\#transforma os valores maiores que 100 e depois conta por cliente}
+\BuiltInTok{print}\NormalTok{(res)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (5, 2)
+## ┌────────┬───────┐
+## │ nome   ┆ valor │
+## │ ---    ┆ ---   │
+## │ str    ┆ u32   │
+## ╞════════╪═══════╡
+## │ null   ┆ 0     │
+## │ Bruno  ┆ 1     │
+## │ Ana    ┆ 2     │
+## │ Daniel ┆ 0     │
+## │ Clara  ┆ 0     │
+## └────────┴───────┘
+\end{verbatim}
+
+JOIN com Múltiplas Colunas como Chave
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{vendas }\OperatorTok{=}\NormalTok{ pl.DataFrame(\{}
+    \StringTok{"id\_venda"}\NormalTok{: [}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{],}
+    \StringTok{"id\_cl"}\NormalTok{: [}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{1}\NormalTok{],}
+    \StringTok{"id\_prod"}\NormalTok{: [}\DecValTok{101}\NormalTok{, }\DecValTok{102}\NormalTok{, }\DecValTok{103}\NormalTok{],}
+    \StringTok{"qtde"}\NormalTok{: [}\DecValTok{2}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{]}
+\NormalTok{\})}
+
+\NormalTok{detalhes\_pedidos }\OperatorTok{=}\NormalTok{ pl.DataFrame(\{}
+    \StringTok{"id\_ped"}\NormalTok{: [}\DecValTok{201}\NormalTok{, }\DecValTok{202}\NormalTok{, }\DecValTok{203}\NormalTok{],}
+    \StringTok{"cl\_id"}\NormalTok{: [}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{1}\NormalTok{],}
+    \StringTok{"id\_prod"}\NormalTok{: [}\DecValTok{101}\NormalTok{, }\DecValTok{102}\NormalTok{, }\DecValTok{104}\NormalTok{],}
+    \StringTok{"valor"}\NormalTok{: [}\FloatTok{50.00}\NormalTok{, }\FloatTok{75.00}\NormalTok{, }\FloatTok{100.00}\NormalTok{]}
+\NormalTok{\})}
+
+\BuiltInTok{print}\NormalTok{(vendas)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (3, 4)
+## ┌──────────┬───────┬─────────┬──────┐
+## │ id_venda ┆ id_cl ┆ id_prod ┆ qtde │
+## │ ---      ┆ ---   ┆ ---     ┆ ---  │
+## │ i64      ┆ i64   ┆ i64     ┆ i64  │
+## ╞══════════╪═══════╪═════════╪══════╡
+## │ 1        ┆ 1     ┆ 101     ┆ 2    │
+## │ 2        ┆ 2     ┆ 102     ┆ 1    │
+## │ 3        ┆ 1     ┆ 103     ┆ 1    │
+## └──────────┴───────┴─────────┴──────┘
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\BuiltInTok{print}\NormalTok{(detalhes\_pedidos)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (3, 4)
+## ┌────────┬───────┬─────────┬───────┐
+## │ id_ped ┆ cl_id ┆ id_prod ┆ valor │
+## │ ---    ┆ ---   ┆ ---     ┆ ---   │
+## │ i64    ┆ i64   ┆ i64     ┆ f64   │
+## ╞════════╪═══════╪═════════╪═══════╡
+## │ 201    ┆ 1     ┆ 101     ┆ 50.0  │
+## │ 202    ┆ 2     ┆ 102     ┆ 75.0  │
+## │ 203    ┆ 1     ┆ 104     ┆ 100.0 │
+## └────────┴───────┴─────────┴───────┘
+\end{verbatim}
+
+Realizando um JOIN com Múltiplas Colunas
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{final }\OperatorTok{=}\NormalTok{ vendas.join(detalhes\_pedidos,}
+\NormalTok{                    left\_on }\OperatorTok{=}\NormalTok{ [}\StringTok{"id\_cl"}\NormalTok{, }\StringTok{"id\_prod"}\NormalTok{],}
+\NormalTok{                    right\_on }\OperatorTok{=}\NormalTok{ [}\StringTok{"cl\_id"}\NormalTok{, }\StringTok{"id\_prod"}\NormalTok{],}
+\NormalTok{                    how }\OperatorTok{=} \StringTok{"inner"}\NormalTok{) }\CommentTok{\#Faz o join usando duas chaves ao mesmo tempo (id\_cl + id\_prod). Assim só bate quem tiver cliente e produto iguais nos dois DataFrames.}
+\BuiltInTok{print}\NormalTok{(final)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## shape: (2, 6)
+## ┌──────────┬───────┬─────────┬──────┬────────┬───────┐
+## │ id_venda ┆ id_cl ┆ id_prod ┆ qtde ┆ id_ped ┆ valor │
+## │ ---      ┆ ---   ┆ ---     ┆ ---  ┆ ---    ┆ ---   │
+## │ i64      ┆ i64   ┆ i64     ┆ i64  ┆ i64    ┆ f64   │
+## ╞══════════╪═══════╪═════════╪══════╪════════╪═══════╡
+## │ 1        ┆ 1     ┆ 101     ┆ 2    ┆ 201    ┆ 50.0  │
+## │ 2        ┆ 2     ┆ 102     ┆ 1    ┆ 202    ┆ 75.0  │
+## └──────────┴───────┴─────────┴──────┴────────┴───────┘
+\end{verbatim}
+
+\end{document}
