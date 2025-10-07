@@ -1,0 +1,169 @@
+---
+title: "Desafio11"
+author: "Luciano Floriano"
+date: "2025-10-07"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message = FALSE, warning = FALSE}
+
+
+# Instalar e configurar reticulate
+library(reticulate)
+reticulate::py_install("pandas")
+reticulate::py_install("matplotlib")
+reticulate::py_install("scipy")
+py_install("seaborn")
+py_install("matplotlib")
+```
+1. Utilizando o arquivo renda_adulta.csve sabendo que ele não possui cabeçalho, faça a importação do banco de dados utilizando os nomes das colunas conforme apresentado acima e na sequência ali indicada. No momento da importação do arquivo, você deve, também, indicar os tipos de cada uma das colunas. Utilize o fato de que o símbolo ?representa valores faltantes.
+
+
+```{python}
+import pandas as pd
+
+# Definindo os nomes das colunas conforme a descrição
+colunas = [
+    "age", "workclass", "fnlwgt", "education", "education-num",
+    "marital-status", "occupation", "relationship", "race", "sex",
+    "capital-gain", "capital-loss", "hours-per-week", "native-country", "income"
+]
+
+# Definindo os tipos das colunas
+tipos = {
+    "age": "int64",
+    "workclass": "category",
+    "fnlwgt": "int64",
+    "education": "category",
+    "education-num": "int64",
+    "marital-status": "category",
+    "occupation": "category",
+    "relationship": "category",
+    "race": "category",
+    "sex": "category",
+    "capital-gain": "int64",
+    "capital-loss": "int64",
+    "hours-per-week": "int64",
+    "native-country": "category",
+    "income": "category"
+}
+
+# Importando o arquivo compactado (.csv.gz), sem cabeçalho, e tratando "?" como valor faltante
+df = pd.read_csv(
+    "renda_adulta.csv.gz",
+    header=None,             # sem cabeçalho
+    names=colunas,           # nomes definidos acima
+    dtype=tipos,             # tipos de dados
+    na_values="?"            # tratar "?" como valor ausente
+)
+
+# Verificando as primeiras linhas e tipos
+print(df.head())
+print(df.info())
+```
+2. Apresente os tipos de cada uma das colunas.
+```{python}
+print(df.dtypes)
+```
+3. Apresente as dimensões da tabela de dados.
+
+```{python}
+print(df.shape)
+```
+
+4, Quantas pessoas recebem acima de $50.000 e quantas pessoas recebem abaixo desses limites?
+
+```{python}
+print(df['income'].value_counts())
+```
+5. Crie um objeto chamado renda_longo, no qual você transforma as colunas capital-gaine capital-loss(formato largo ) para formato longo. Os valores dessas variáveis devem ser armazenados em uma nova coluna de chamada Valore os tipos de valores ( ganho e perda ) devem ser armazenados em uma coluna de chamada tipo.
+
+```{python}
+import pandas as pd
+
+# Criar o dataframe em formato longo
+renda_longo = pd.melt(
+    df,
+    id_vars=[col for col in df.columns if col not in ['capital-gain', 'capital-loss']],
+    value_vars=['capital-gain', 'capital-loss'],
+    var_name='tipo',
+    value_name='Valor'
+)
+
+# Substituir nomes técnicos por "ganho" e "perda"
+renda_longo['tipo'] = renda_longo['tipo'].replace({
+    'capital-gain': 'ganho',
+    'capital-loss': 'perda'
+})
+
+# Exibir as primeiras linhas
+print(renda_longo.head())
+```
+6. Quais são as médias de horas trabalhadas por classe salarial?
+
+```{python}
+media_horas = (
+    df.groupby('income', observed=True)['hours-per-week']
+      .mean()
+      .reset_index()
+      .rename(columns={'income': 'Classe Salarial', 'hours-per-week': 'Média de Horas/Semana'})
+)
+
+print(media_horas)
+```
+7. Se cada linha representa uma pessoa, quantas pessoas foram amostradas em cada profissão?
+
+```{python}
+# Contar quantas pessoas há em cada profissão
+contagem_profissoes = df['occupation'].value_counts(dropna=False)
+
+print(contagem_profissoes)
+```
+8. Crie um gráfico de barras que apresenta o número médio de horas trabalhadas semanalmente em função do nível salarial.
+```{python}
+# Análise estatística para evidência de discriminação salarial entre gêneros
+
+# 1. Tabela de contingência com porcentagens por linha
+tabela_porcentagem = pd.crosstab(df['sex'], df['income'], normalize='index') * 100
+print("Distribuição percentual da renda por gênero:")
+print(tabela_porcentagem)
+print("\n")
+
+# 2. Tabela de contingência com contagens absolutas
+tabela_absoluta = pd.crosstab(df['sex'], df['income'])
+print("Distribuição absoluta da renda por gênero:")
+print(tabela_absoluta)
+print("\n")
+
+# 3. Teste Qui-Quadrado para significância estatística
+from scipy.stats import chi2_contingency
+
+chi2, p_valor, dof, expected = chi2_contingency(tabela_absoluta)
+print(f"Teste Qui-Quadrado de Independência:")
+print(f"Estatística Qui-Quadrado: {chi2:.4f}")
+print(f"Valor-p: {p_valor:.4f}")
+print(f"Graus de liberdade: {dof}")
+
+# 4. Interpretação do valor-p
+if p_valor < 0.05:
+    print("\n Há evidências estatísticas de associação entre gênero e renda (p < 0.05)")
+    print("Isso sugere possível discriminação salarial por gênero.")
+else:
+    print("\n Não há evidências estatísticas suficientes de associação (p >= 0.05)")
+
+# 5. Diferença percentual entre gêneros
+diferenca_percentual = (tabela_porcentagem.loc['Male', '>50K'] - 
+                       tabela_porcentagem.loc['Female', '>50K'])
+print(f"\nDiferença percentual na faixa >50K: {diferenca_percentual:.2f}%")
+print(f"Homens com >50K: {tabela_porcentagem.loc['Male', '>50K']:.2f}%")
+print(f"Mulheres com >50K: {tabela_porcentagem.loc['Female', '>50K']:.2f}%")
+```
+
+
+
