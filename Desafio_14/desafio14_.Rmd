@@ -1,0 +1,169 @@
+---
+title: "Desafio 14"
+author: "Luciano Floriano"
+date: "2025-10-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+reticulate::py_install(c("pandas", "matplotlib", "seaborn"))
+```
+
+Importe o conjunto de dados diamonds, cujo arquivo está disponível no website da disciplina.
+
+Crie uma visualização de dados que descreva a associação existente entre as variáveis peso (carat) e preço (price). Que ações você tomou para garantir que você produziu um gráfico de boa qualidade? Escreva um parágrafo comunicando os seus achados.
+
+
+```{python}
+# Importação das bibliotecas necessárias
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Leitura do conjunto de dados
+diamonds = pd.read_csv("diamonds.csv.gz")
+
+# Exibe as primeiras linhas para conferência
+print(diamonds.head())
+
+# Configurações de estilo para um gráfico de boa qualidade
+sns.set(style="whitegrid", context="talk", palette="viridis")
+
+# Criação do gráfico de dispersão (scatterplot)
+plt.figure(figsize=(10, 6))
+sns.scatterplot(
+    data=diamonds.sample(5000, random_state=42),  # amostragem para evitar sobreposição excessiva
+    x="carat",
+    y="price",
+    alpha=0.6
+)
+
+# Títulos e rótulos claros
+plt.title("Relação entre Peso (carat) e Preço (price) dos Diamantes", fontsize=16)
+plt.xlabel("Peso (carat)", fontsize=14)
+plt.ylabel("Preço (USD)", fontsize=14)
+plt.tight_layout()
+
+# Exibição do gráfico
+plt.show()
+```
+
+Na produção do gráfico, foi utilizado uma certa transparência para entender onde há sobreposição de dados. Pode-se observar que há uma correlação positiva entre peso e preço, ou seja, quanto mais pesado mais caro. Ademais, diamantes com mais de 2 quilates apresentam crescimento de preço acelerado.
+
+```{python}
+# Importação das bibliotecas necessárias
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Leitura do conjunto de dados
+diamonds = pd.read_csv("diamonds.csv.gz")
+
+# Configurações de estilo para melhor visualização
+sns.set(style="whitegrid", context="talk", palette="viridis")
+
+# Gráfico: Relação entre carat e price, diferenciando por tipo de corte (cut)
+plt.figure(figsize=(10, 6))
+sns.scatterplot(
+    data=diamonds.sample(5000, random_state=42),
+    x="carat",
+    y="price",
+    hue="cut",
+    alpha=0.8
+)
+
+# Ajustes visuais
+plt.title("Relação entre Peso (carat) e Preço (price) por Tipo de Corte (cut)", fontsize=16)
+plt.xlabel("Peso (carat)", fontsize=14)
+plt.ylabel("Preço (USD)", fontsize=14)
+plt.legend(title="Corte", bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.tight_layout()
+plt.show()
+
+# Análise descritiva complementar: tendência média por corte
+plt.figure(figsize=(10, 6))
+sns.lineplot(
+    data=diamonds,
+    x="carat",
+    y="price",
+    hue="cut",
+    estimator="mean"
+)
+```
+A relação positiva entre peso e preço se mantém presente em todos os tipos de corte, porém os diamantes com cortes de maior qualidade, Ideal e Premium, apresentam preços mais altos com pesos parecidos, enuquanto os cortes inferioresm como Fair e Good, têm preços mais baixos, concluindo que o tipo de corte influencia o valor de mercado dos diamantes.
+
+
+
+```{python}
+
+# Gráfico 1 - Corte (Seaborn)
+plt.figure(figsize=(10, 6))
+sns.scatterplot(
+    data=diamonds_sample,
+    x='carat',
+    y='price',
+    hue='cut',
+    hue_order=cut_order,
+    palette='husl',
+    alpha=0.7,
+    s=60
+)
+plt.title('Preço vs Peso por Qualidade de Corte', fontsize=14, weight='bold')
+plt.xlabel('Peso (carat)', fontsize=12)
+plt.ylabel('Preço (USD)', fontsize=12)
+plt.legend(title='Corte')
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+# Gráfico 2 - Cor (Seaborn)
+plt.figure(figsize=(10, 6))
+sns.scatterplot(
+    data=diamonds_sample,
+    x='carat',
+    y='price',
+    hue='color',
+    palette='viridis',
+    alpha=0.7,
+    s=60
+)
+plt.title('Preço vs Peso por Cor do Diamante', fontsize=14, weight='bold')
+plt.xlabel('Peso (carat)', fontsize=12)
+plt.ylabel('Preço (USD)', fontsize=12)
+plt.legend(title='Cor')
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+# Gráfico 3 - Clareza (Seaborn)
+plt.figure(figsize=(10, 6))
+sns.scatterplot(
+    data=diamonds_sample,
+    x='carat',
+    y='price',
+    hue='clarity',
+    hue_order=clarity_order,
+    palette='plasma',
+    alpha=0.7,
+    s=60
+)
+plt.title('Preço vs Peso por Clareza do Diamante', fontsize=14, weight='bold')
+plt.xlabel('Peso (carat)', fontsize=12)
+plt.ylabel('Preço (USD)', fontsize=12)
+plt.legend(title='Clareza', fontsize=9)
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+```
+Pode-se observar que há uma forte relação crescente entre peso e preço, entretanto esse ritmo de crescimento viaria de acordo com o corte, cor e clareza. Cortes de qualidade superior tendem a ter preços mais altos. Entretanto, quando analisamos a cor dos diamantes, essa tendência ainda continua, porém so preços dos diamantes variam com as cores, tendo uma boa quantidade da "pior" cor (J) nos diamantes mais caros e com maior peso. Sobre as dificuldades, é intensamente difícil condensar esses três gráficos num só, pois os dados se sobrepõem e ainda ficam com uma análise com pouca clareza. 
+
+ Cortes de qualidade superior tendem a ter
+# preços mais elevados para o mesmo peso. A principal dificuldade
+# foi representar três variáveis categóricas simultaneamente sem
+# sobrecarregar o gráfico — o uso de facetas, cores e tamanhos
+# ajudou a tornar a visualização mais interpretável.
+
